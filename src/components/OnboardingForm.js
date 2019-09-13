@@ -7,9 +7,9 @@ import * as yup from 'yup'
 import axios from 'axios'
 
 
-const UserForm = (props) => {
+const OnboardingForm = (props) => {
 
-    const [users, setUsers] = useState([{}])
+    const [users, setUsers] = useState([])
   
     useEffect( () => {
       if(props.status){
@@ -23,6 +23,9 @@ const UserForm = (props) => {
   
     return (
       <Form>
+
+        <h2 style={{textAlign:'center'}}>User Onboarding</h2><br />
+
         {props.touched.name && props.errors.name && <p className='error'>{props.errors.name}</p>}
         <Field type="text" name="name" placeholder="Name" />
         
@@ -38,23 +41,11 @@ const UserForm = (props) => {
             <span>Terms of Service</span>
         </label>
 
-        {props.touched.diet && props.errors.diet && <p className='error'>{props.errors.diet}</p>}
-        <Field component="select" name="diet">
-          <option value="" disabled>Select Diet:</option>{/* <-- This is our placeholder*/}
-          <option value="carnivore">Carnivore</option>
-          <option value="herbivore">Herbivore</option>
-          <option value="omnivore">Omnivore</option>
-        </Field>
-  
-        
-  
-        <Field component="textarea" name="notes" placeholder="Notes" />
-  
         <button type="submit">Submit</button>
   
-        {animals.map(animal => {
+        { users.map( (user, index) => {
   
-          return <div>name: {animal.name}</div>
+          return <div key={index}>name: {user.name}</div>
         }
         )}
   
@@ -70,21 +61,22 @@ const UserForm = (props) => {
         //these keys line up with the 'name' attribute in our Fields
         name: currentValuesFromOurForm.name || '',
         email: currentValuesFromOurForm.email || '',
-        diet: currentValuesFromOurForm.diet || '',
-        vaccinations: currentValuesFromOurForm.vaccinations || false,
-        notes: currentValuesFromOurForm.notes || ''
+        password: currentValuesFromOurForm.password || '',
+        tos: currentValuesFromOurForm.tos || false
       }
     },
     validationSchema: yup.object().shape({
       name: yup.string().required('You Forgot name Foo!'),
-      email: yup.number().required('You Forgot email Foo!').positive(),
-      diet: yup.string().required('You Forgot Diet Foo!'),
-      vaccinations: yup.boolean().oneOf([true], 'Animal Must Be Vaccinated')
+      email: yup.string().email().required('You Forgot email Foo!'),
+      password: yup.string().required('You Forgot Password Foo!'),
+      tos: yup.boolean().oneOf([true], 'Terms of Service Must Be Checked')
     }),
     handleSubmit: (values, {setStatus}) => {
-      axios.post('https://reqres.in/api/animals', values)
+      axios.post('https://reqres.in/api/users', values)
       .then(( res ) => {
-        console.log(res)
+        
+        setStatus(res.data)
+        // console.log(res)
       })
       .catch (( err ) => {
         console.log("Error: ", err)
@@ -93,5 +85,5 @@ const UserForm = (props) => {
       console.log(values)
     }
   
-  })(UserForm )
+  })(OnboardingForm)
   
